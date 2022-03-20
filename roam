@@ -1,0 +1,33 @@
+# Rotor's AUR manager
+
+if [ ! -z $1 ]
+then 
+	git ls-remote --exit-code https://aur.archlinux.org/$1.git >> /dev/null
+
+	if [ $? -eq 0 ]
+		then
+			echo -e "Installing $1"
+		if [ ! -d /tmp/lramtemp ]
+		then
+			mkdir /tmp/lramtemp
+		fi
+		git clone https://aur.archlinux.org/$1.git /tmp/lramtemp/$1/
+		if [ $? -eq 0 ]
+		then
+			cd /tmp/lramtemp/$1
+			makepkg -si
+			if [ $? -eq 0 ]
+			then
+				echo -e "$1 installation failed (unable to make package)"
+			fi
+		else
+			echo -e "$1 installation failed (unable to clone repository)"
+		fi
+		echo -e "Cleaning up..."
+		rm -rf /tmp/lramtemp
+	else
+		echo "$1 installation failed (repository either doesn't exist or cannot be reached)"
+	fi
+else
+	echo "Nothing to install." 
+fi
